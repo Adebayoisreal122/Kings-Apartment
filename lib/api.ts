@@ -1,4 +1,4 @@
-export const API = process.env.NEXT_PUBLIC_API_URL || 'https://kings-back-a41w.onrender.com/api';
+export const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 export const getToken = () => (typeof window === 'undefined' ? null : localStorage.getItem('ka_token'));
 export async function api<T = any>(path: string, opts: RequestInit = {}): Promise<T> {
   const token = getToken();
