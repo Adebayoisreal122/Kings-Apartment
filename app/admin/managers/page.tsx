@@ -24,7 +24,7 @@ export default function Managers() {
           <h2 className="text-xl sm:col-span-2">New branch manager</h2>
           <input className="input" required placeholder="Full name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
           <input className="input" required type="email" placeholder="Email (they sign in with this)" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
-          <input className="input" type="tel" placeholder="Phone" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} />
+          <input className="input" required type="tel" placeholder="Phone (booking SMS alerts go here)" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} />
           <input className="input" required minLength={8} type="text" placeholder="Temporary password (8+ characters)" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} />
           <select className="input sm:col-span-2" required value={f.branch} onChange={(e) => setF({ ...f, branch: e.target.value })}><option value="">Branch this manager runs</option>{branches.map((b) => <option key={b._id} value={b._id}>{b.name}</option>)}</select>
           <div className="flex gap-2 sm:col-span-2"><button className="btn-gold">Add manager</button><button type="button" className="btn-ghost" onClick={() => setF(null)}>Cancel</button></div>
@@ -34,7 +34,7 @@ export default function Managers() {
         <form onSubmit={save} className="card mb-6 grid gap-3 sm:grid-cols-2">
           <h2 className="text-xl sm:col-span-2">Edit {ed.email}</h2>
           <input className="input" required value={ed.name} onChange={(e) => setEd({ ...ed, name: e.target.value })} />
-          <input className="input" type="tel" placeholder="Phone" value={ed.phone || ''} onChange={(e) => setEd({ ...ed, phone: e.target.value })} />
+          <input className="input" required type="tel" placeholder="Phone (booking SMS alerts go here)" value={ed.phone ? `+${ed.phone}` : ''} onChange={(e) => setEd({ ...ed, phone: e.target.value })} />
           <select className="input" value={ed.branch?._id || ed.branch || ''} onChange={(e) => setEd({ ...ed, branch: e.target.value })}>{branches.map((b) => <option key={b._id} value={b._id}>{b.name}</option>)}</select>
           <input className="input" type="text" minLength={8} placeholder="New password (leave empty to keep)" value={ed.password || ''} onChange={(e) => setEd({ ...ed, password: e.target.value })} />
           <div className="flex gap-2 sm:col-span-2"><button className="btn-gold">Save changes</button><button type="button" className="btn-ghost" onClick={() => setEd(null)}>Cancel</button></div>
@@ -47,7 +47,7 @@ export default function Managers() {
             {list.map((m) => (
               <tr key={m._id} className="border-b border-navy/5 last:border-0">
                 <td className="p-4"><p className="font-medium">{m.name}</p><p className="text-xs text-navy/50">{m.email}</p></td>
-                <td>{m.branch?.name || <span className="text-red-700">No branch</span>}</td><td>{m.phone || '-'}</td>
+                <td>{m.branch?.name || <span className="text-red-700">No branch</span>}</td><td>{m.phone ? `+${m.phone}` : <span className="text-red-700">Add a phone to get SMS alerts</span>}</td>
                 <td><span className={`badge ${m.active ? 'bg-emerald-100 text-emerald-800' : 'bg-navy-100 text-navy/60'}`}>{m.active ? 'Active' : 'Deactivated'}</span></td>
                 <td className="space-x-2 pr-4"><button className="btn-ghost !px-3 !py-1" onClick={() => setEd({ ...m, _id: m._id })}>Edit</button>
                   <button className="btn-ghost !px-3 !py-1" onClick={() => run(() => api(`/admin/users/${m._id}`, { method: 'PATCH', body: JSON.stringify({ active: !m.active }) }), m.active ? 'Manager deactivated. They can no longer sign in.' : 'Manager reactivated.')}>{m.active ? 'Deactivate' : 'Activate'}</button></td>

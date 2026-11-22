@@ -10,7 +10,7 @@ const links = [['#about', 'About'], ['#rooms', 'Rooms'], ['#branches', 'Branches
 export default function Nav() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
-  const cta = user ? <Link className="btn-gold" href={home(user.role)}>Dashboard</Link> : <><Link className="btn text-white hover:bg-white/10" href="/login">Sign in</Link><Link className="btn-gold" href="/register">Book now</Link></>;
+  const cta = <><Link className="btn text-white hover:bg-white/10" href="/track">Track booking</Link>{user && <Link className="btn border border-white/30 text-white hover:bg-white/10" href={home(user.role)}>Dashboard</Link>}<Link className="btn-gold" href="/book">Book now</Link></>;
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-navy/95 text-white backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3">

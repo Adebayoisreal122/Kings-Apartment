@@ -37,7 +37,7 @@ export default function ManagerOverview() {
           <ul className="divide-y divide-navy/5">
             {pending.slice(0, 6).map((b) => (
               <li key={b._id} className="flex flex-wrap items-center justify-between gap-3 py-3">
-                <div><p className="font-medium">{b.customer?.name} <span className="text-xs font-normal text-navy/50">{b.reference}</span></p><p className="text-sm text-navy/60">{b.roomType?.name} · {new Date(b.checkIn).toLocaleDateString()} to {new Date(b.checkOut).toLocaleDateString()} · {naira(b.total)}</p></div>
+                <div><p className="font-medium">{b.guest?.name} <span className="text-xs font-normal text-navy/50">{b.reference}</span></p><p className="text-sm text-navy/60">{b.roomType?.name} · {new Date(b.checkIn).toLocaleDateString()} to {new Date(b.checkOut).toLocaleDateString()} · {naira(b.total)}</p></div>
                 <div className="flex gap-2"><button className="btn-gold !px-4 !py-1.5" onClick={() => decide(b._id, 'confirmed')}>Confirm</button><button className="btn-ghost !px-4 !py-1.5" onClick={() => decide(b._id, 'cancelled')}>Decline</button></div>
               </li>))}
             {pending.length === 0 && <li className="py-6 text-sm text-navy/60">You are all caught up. New bookings appear here the moment a guest books.</li>}

@@ -1,4 +1,4 @@
-export const API = process.env.NEXT_PUBLIC_API_URL || 'https://kings-back-a41w.onrender.com';
+export const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 export const getToken = () => (typeof window === 'undefined' ? null : localStorage.getItem('ka_token'));
 export async function api<T = any>(path: string, opts: RequestInit = {}): Promise<T> {
   const token = getToken();
@@ -23,4 +23,10 @@ export async function uploadImage(file: File): Promise<string> {
   const d = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(d.message || 'Upload failed');
   return d.url;
+}
+export async function downloadFile(path: string, name: string) {
+  const res = await fetch(`${API}/api${path}`);
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).message || 'Download failed. Try again.');
+  const url = URL.createObjectURL(await res.blob());
+  const a = document.createElement('a'); a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url);
 }

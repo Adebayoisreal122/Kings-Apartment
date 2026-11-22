@@ -2,7 +2,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { BedDouble, Building2, CalendarCheck, FileDown, LayoutDashboard, LogOut, Menu, Search, Star, Ticket, User, UserCog, X, type LucideIcon } from 'lucide-react';
+import { BedDouble, Building2, CalendarCheck, FileDown, LayoutDashboard, LogOut, Menu, Star, Ticket, UserCog, X, type LucideIcon } from 'lucide-react';
 import { Role, useAuth, home } from '@/lib/auth';
 import Logo from './Logo';
 import Bell from './Bell';
@@ -20,12 +20,8 @@ const NAV: Record<Role, Item[]> = {
     { href: '/manager', label: 'Overview', icon: LayoutDashboard }, { href: '/manager/bookings', label: 'Bookings', icon: CalendarCheck },
     { href: '/manager/rooms', label: 'Rooms', icon: BedDouble }, { href: '/manager/reports', label: 'Reports', icon: FileDown },
   ],
-  customer: [
-    { href: '/dashboard', label: 'Book a stay', icon: Search }, { href: '/dashboard/bookings', label: 'My bookings', icon: CalendarCheck },
-    { href: '/dashboard/profile', label: 'Profile', icon: User },
-  ],
 };
-const ROOT = ['/admin', '/manager', '/dashboard'];
+const ROOT = ['/admin', '/manager'];
 
 // Shared dashboard layout: navy sidebar (drawer on phones), light top bar, content area.
 export default function Shell({ role, title, subtitle, actions, children }: { role: Role; title: string; subtitle?: string; actions?: ReactNode; children: ReactNode }) {
@@ -41,7 +37,7 @@ export default function Shell({ role, title, subtitle, actions, children }: { ro
   useEffect(() => setOpen(false), [path]);
   if (!user || user.role !== role) return <div className="p-10 text-sm text-navy/60">Loading…</div>;
 
-  const roleLabel = role === 'admin' ? 'Head office' : role === 'branch_manager' ? `Manager · ${user.branchName || 'Branch'}` : 'Guest';
+  const roleLabel = role === 'admin' ? 'Head office' : `Manager · ${user.branchName || 'Branch'}`;
   const active = (h: string) => (ROOT.includes(h) ? path === h : path.startsWith(h));
   const side = (
     <div className="flex h-full flex-col bg-navy text-white">

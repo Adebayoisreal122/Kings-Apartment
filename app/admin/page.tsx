@@ -8,7 +8,7 @@ import StatusBadge from '@/components/StatusBadge';
 import { api, naira } from '@/lib/api';
 
 export default function AdminOverview() {
-  const [stats, setStats] = useState<any>({ byBranch: [], totals: [], customers: 0 });
+  const [stats, setStats] = useState<any>({ byBranch: [], totals: [], guests: 0 });
   const [branches, setBranches] = useState<any[]>([]);
   const [recent, setRecent] = useState<any[]>([]);
   const [err, setErr] = useState('');
@@ -28,7 +28,7 @@ export default function AdminOverview() {
         <StatCard icon={Clock} label="Waiting for confirmation" value={count('pending')} />
         <StatCard icon={BedDouble} tone="green" label="Guests in house" value={count('checked_in')} />
         <StatCard icon={Building2} tone="navy" label="Branches" value={branches.length} />
-        <StatCard icon={Users} label="Registered guests" value={stats.customers} />
+        <StatCard icon={Users} label="Guests who booked" value={stats.guests} />
       </div>
       <div className="mb-6 grid gap-6 lg:grid-cols-3">
         <section className="card lg:col-span-2">
@@ -48,7 +48,7 @@ export default function AdminOverview() {
         <div className="flex items-center justify-between p-5 pb-2"><h2 className="text-xl">Latest bookings</h2><Link href="/admin/bookings" className="text-sm underline">View all</Link></div>
         <table className="w-full text-left text-sm">
           <thead className="border-b border-navy/10 text-navy/60"><tr><th className="p-4">Reference</th><th>Guest</th><th>Branch</th><th>Total</th><th className="pr-4">Status</th></tr></thead>
-          <tbody>{recent.map((b) => <tr key={b._id} className="border-b border-navy/5 last:border-0"><td className="p-4">{b.reference}</td><td>{b.customer?.name}</td><td>{b.branch?.name}</td><td>{naira(b.total)}</td><td className="pr-4"><StatusBadge s={b.status} /></td></tr>)}
+          <tbody>{recent.map((b) => <tr key={b._id} className="border-b border-navy/5 last:border-0"><td className="p-4">{b.reference}</td><td>{b.guest?.name}</td><td>{b.branch?.name}</td><td>{naira(b.total)}</td><td className="pr-4"><StatusBadge s={b.status} /></td></tr>)}
             {recent.length === 0 && <tr><td colSpan={5} className="p-6 text-navy/60">No bookings yet.</td></tr>}</tbody>
         </table>
       </section>

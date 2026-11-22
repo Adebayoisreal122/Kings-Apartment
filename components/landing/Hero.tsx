@@ -2,18 +2,16 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { CalendarDays, MapPin, Users } from 'lucide-react';
-import { useAuth, home } from '@/lib/auth';
 
 const today = () => new Date().toISOString().slice(0, 10);
 const plus = (d: string, n: number) => new Date(+new Date(d) + n * 864e5).toISOString().slice(0, 10);
 export default function Hero({ branches }: { branches: any[] }) {
   const router = useRouter();
-  const { user } = useAuth();
   const [f, setF] = useState({ branch: '', checkIn: today(), checkOut: plus(today(), 1), guests: 1 });
   const go = (e: React.FormEvent) => {
     e.preventDefault();
     const q = new URLSearchParams({ ...(f.branch ? { branch: f.branch } : {}), in: f.checkIn, out: f.checkOut, guests: String(f.guests) });
-    router.push(user?.role === 'customer' ? `/dashboard?${q}` : user ? home(user.role) : `/register?${q}`);
+    router.push(`/book?${q}`);
   };
   return (
     <section className="relative overflow-hidden bg-navy text-white">

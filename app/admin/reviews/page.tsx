@@ -14,7 +14,7 @@ export default function Reviews() {
       <div className="space-y-3">
         {list.map((r) => (
           <div key={r._id} className={`card flex flex-wrap items-start justify-between gap-3 ${r.hidden ? 'opacity-60' : ''}`}>
-            <div><Stars value={r.rating} /> <span className="text-sm text-navy/60">{r.customer?.name} · {r.branch?.name} · {new Date(r.createdAt).toLocaleDateString()}</span>
+            <div><Stars value={r.rating} /> <span className="text-sm text-navy/60">{r.guestName} · {r.branch?.name} · {new Date(r.createdAt).toLocaleDateString()}</span>
               <p className="mt-1 text-sm">{r.comment || <i className="text-navy/50">No comment</i>}</p></div>
             <button className="btn-ghost !px-4 !py-1.5" onClick={() => toggle(r)}>{r.hidden ? 'Show to guests' : 'Hide'}</button>
           </div>

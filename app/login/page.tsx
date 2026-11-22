@@ -17,12 +17,12 @@ export default function Login() {
     <main className="flex min-h-screen items-center justify-center bg-navy-50 p-5">
       <form onSubmit={submit} className="card w-full max-w-sm space-y-4">
         <Logo />
-        <h1 className="pt-2 text-2xl">Sign in</h1>
+        <h1 className="pt-2 text-2xl">Staff sign in</h1><p className="text-sm text-navy/60">For head office and branch managers. Guests do not need an account.</p>
         <input className="input" type="email" placeholder="Email" required value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
         <input className="input" type="password" placeholder="Password" required value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} />
         {err && <p role="alert" className="text-sm text-red-700">{err}</p>}
         <button className="btn-navy w-full" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
-        <p className="text-center text-sm text-navy/60">New here? <Link className="text-navy underline" href="/register">Create an account</Link></p>
+        <p className="text-center text-sm text-navy/60"><Link className="underline" href="/book">Book a stay instead</Link></p>
       </form>
     </main>
   );

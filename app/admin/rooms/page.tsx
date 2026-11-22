@@ -21,14 +21,16 @@ export default function RoomsAndRates() {
   const [rules, setRules] = useState<any[]>([]);
   const [td, setTd] = useState<any | null>(null); // room type being created or edited
   const [rf, setRf] = useState({ roomType: '', numbers: '' });
+  const [sds, setSds] = useState<any[]>([]);
+  const [sf, setSf] = useState({ name: 'Weekly stay', minNights: 7, percent: 10, scope: 'all', roomType: '' });
   const [rr, setRr] = useState({ name: '', roomType: '', startDate: '', endDate: '', mode: 'percent', value: 10, weekendsOnly: false });
   const [msg, setMsg] = useState('');
 
   useEffect(() => { api('/admin/branches').then((b) => { setBranches(b); setBid(b[0]?._id || ''); }); }, []);
   const load = useCallback(async () => {
     if (!bid) return;
-    const [t, r, u] = await Promise.all([api(`/admin/room-types?branch=${bid}`), api(`/admin/rooms?branch=${bid}`), api(`/admin/rate-rules?branch=${bid}`)]);
-    setTypes(t); setRooms(r); setRules(u);
+    const [t, r, u, d] = await Promise.all([api(`/admin/room-types?branch=${bid}`), api(`/admin/rooms?branch=${bid}`), api(`/admin/rate-rules?branch=${bid}`), api('/admin/stay-discounts')]);
+    setTypes(t); setRooms(r); setRules(u); setSds(d);
   }, [bid]);
   useEffect(() => { load().catch((e) => setMsg(e.message)); }, [load]);
   const run = async (fn: () => Promise<any>) => { setMsg(''); try { await fn(); await load(); } catch (e: any) { setMsg(e.message); } };
@@ -47,6 +49,9 @@ export default function RoomsAndRates() {
   const addRule = (e: React.FormEvent) => { e.preventDefault(); run(async () => {
     await api('/admin/rate-rules', { method: 'POST', body: JSON.stringify({ ...rr, value: +rr.value, branch: bid, roomType: rr.roomType || null }) });
     setRr({ ...rr, name: '' });
+  }); };
+  const addStay = (e: React.FormEvent) => { e.preventDefault(); run(async () => {
+    await api('/admin/stay-discounts', { method: 'POST', body: JSON.stringify({ name: sf.name, minNights: +sf.minNights, percent: +sf.percent, branch: sf.scope === 'branch' ? bid : null, roomType: sf.roomType || null }) });
   }); };
   const effect = (r: any) => (r.mode === 'set' ? `${naira(r.value)} per night` : `${r.value > 0 ? '+' : ''}${r.value}%`) + (r.weekendsOnly ? ' on Fri and Sat nights' : '');
   const day = (d: string) => new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
@@ -123,6 +128,30 @@ export default function RoomsAndRates() {
             <label className="text-xs">{rr.mode === 'percent' ? 'Percent' : 'Price (₦)'}<input className="input mt-1" type="number" required value={rr.value} onChange={(e) => setRr({ ...rr, value: +e.target.value })} /></label>
             <label className="flex items-center gap-2 text-sm sm:col-span-3"><input type="checkbox" checked={rr.weekendsOnly} onChange={(e) => setRr({ ...rr, weekendsOnly: e.target.checked })} /> Fri and Sat nights only</label>
             <button className="btn-gold">Add rule</button>
+          </form>
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="mb-1 text-2xl">Long-stay discounts</h2>
+        <p className="mb-3 text-sm text-navy/60">Guests who book at least this many nights get the percent off automatically. If more than one applies, the biggest discount wins.</p>
+        <div className="card">
+          <ul className="mb-4 divide-y divide-navy/5 text-sm">
+            {sds.map((d) => (
+              <li key={d._id} className="flex flex-wrap items-center justify-between gap-2 py-3">
+                <span><b>{d.name}</b>: {d.minNights}+ nights, {d.percent}% off<br /><span className="text-navy/60">{d.branch?.name || 'All branches'} · {d.roomType?.name || 'All room types'}{d.active ? '' : ' · paused'}</span></span>
+                <span className="flex gap-2"><button className="btn-ghost !px-3 !py-1" onClick={() => run(() => api(`/admin/stay-discounts/${d._id}`, { method: 'PATCH', body: JSON.stringify({ active: !d.active }) }))}>{d.active ? 'Pause' : 'Resume'}</button><button className="btn-ghost !px-3 !py-1" onClick={() => run(() => api(`/admin/stay-discounts/${d._id}`, { method: 'DELETE' }))}>Delete</button></span>
+              </li>
+            ))}
+            {sds.length === 0 && <li className="py-3 text-navy/60">No long-stay discounts yet.</li>}
+          </ul>
+          <form onSubmit={addStay} className="grid gap-2 sm:grid-cols-4">
+            <input className="input sm:col-span-2" required placeholder="Name, e.g. Monthly stay" value={sf.name} onChange={(e) => setSf({ ...sf, name: e.target.value })} />
+            <label className="text-xs">From (nights)<input className="input mt-1" type="number" min={2} required value={sf.minNights} onChange={(e) => setSf({ ...sf, minNights: +e.target.value })} /></label>
+            <label className="text-xs">Percent off<input className="input mt-1" type="number" min={1} max={90} required value={sf.percent} onChange={(e) => setSf({ ...sf, percent: +e.target.value })} /></label>
+            <select className="input sm:col-span-2" value={sf.scope} onChange={(e) => setSf({ ...sf, scope: e.target.value })}><option value="all">All branches</option><option value="branch">Only the selected branch</option></select>
+            <select className="input" value={sf.roomType} onChange={(e) => setSf({ ...sf, roomType: e.target.value })}><option value="">All room types</option>{types.map((t) => <option key={t._id} value={t._id}>{t.name}</option>)}</select>
+            <button className="btn-gold">Add discount</button>
           </form>
         </div>
       </section>

@@ -16,11 +16,12 @@ export default function ManagerBookings() {
     const [b, r] = await Promise.all([api(`/manager/bookings${filter ? `?status=${filter}` : ''}`), api('/manager/rooms')]);
     setBookings(b); setRooms(r);
   }, [filter]);
+  useEffect(() => { const r = new URLSearchParams(location.search).get('ref'); if (r) setQ(r); }, []);
   useEffect(() => { load().catch((e) => setErr(e.message)); }, [load]);
   useEffect(() => { const s = io(API, { auth: { token: getToken() } }); s.on('notification', () => load()); return () => { s.disconnect(); }; }, [load]);
   const move = async (id: string, status: string, roomId?: string) => { setErr(''); try { await api(`/manager/bookings/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status, roomId }) }); load(); } catch (e: any) { setErr(e.message); } };
   const free = (b: any) => rooms.filter((r) => r.status === 'available' && String(r.roomType?._id) === String(b.roomType?._id));
-  const shown = bookings.filter((b) => !q || `${b.reference} ${b.customer?.name}`.toLowerCase().includes(q.toLowerCase()));
+  const shown = bookings.filter((b) => !q || `${b.reference} ${b.guest?.name}`.toLowerCase().includes(q.toLowerCase()));
   return (
     <Shell role="branch_manager" title="Bookings" subtitle="Confirm, check in and check out guests" actions={<button className="btn-ghost" onClick={() => downloadCsv('/manager/report.csv', 'branch-bookings.csv').catch((e) => setErr(e.message))}>Export CSV</button>}>
       <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -34,7 +35,7 @@ export default function ManagerBookings() {
           <tbody>
             {shown.map((b) => (
               <tr key={b._id} className="border-b border-navy/5 last:border-0">
-                <td className="p-4"><p className="font-medium">{b.customer?.name}</p><p className="text-xs text-navy/50">{b.reference} · {b.customer?.phone}</p></td>
+                <td className="p-4"><p className="font-medium">{b.guest?.name}</p><p className="text-xs text-navy/50">{b.reference} · <a className="underline" href={`tel:+${b.guest?.phone}`}>+{b.guest?.phone}</a></p></td>
                 <td>{b.roomType?.name}{b.room && ` · ${b.room.number}`}</td>
                 <td className="whitespace-nowrap">{new Date(b.checkIn).toLocaleDateString()} to {new Date(b.checkOut).toLocaleDateString()}</td>
                 <td>{naira(b.total)} <StatusBadge s={b.paymentStatus} /></td><td><StatusBadge s={b.status} /></td>

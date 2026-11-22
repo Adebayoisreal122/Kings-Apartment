@@ -5,7 +5,7 @@ import Shell from '@/components/Shell';
 import ImageUpload from '@/components/ImageUpload';
 import { api } from '@/lib/api';
 
-const blank = { name: '', city: '', state: '', address: '', phone: '', description: '', amenitiesText: 'Wi-Fi, Power 24/7, Parking', images: [] as string[], active: true };
+const blank = { name: '', area: '', isHeadOffice: false, city: '', state: '', address: '', phone: '', description: '', amenitiesText: 'Wi-Fi, Power 24/7, Parking', images: [] as string[], active: true };
 export default function Branches() {
   const [list, setList] = useState<any[]>([]);
   const [d, setD] = useState<any | null>(null);
@@ -29,13 +29,14 @@ export default function Branches() {
           <h2 className="text-xl">{d._id ? `Edit ${d.name}` : 'New branch'}</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             <input className="input" placeholder="Branch name, e.g. The King's Apartment, Ibadan" required {...f('name')} /><input className="input" placeholder="City" required {...f('city')} />
-            <input className="input" placeholder="State" {...f('state')} /><input className="input" placeholder="Phone" {...f('phone')} />
+            <input className="input" placeholder="Area, e.g. Yaba" {...f('area')} /><input className="input" placeholder="State" {...f('state')} /><input className="input" placeholder="Phone" {...f('phone')} />
             <input className="input sm:col-span-2" placeholder="Address" required {...f('address')} />
             <textarea className="input sm:col-span-2" rows={3} placeholder="Short description" {...f('description')} />
             <input className="input sm:col-span-2" placeholder="Amenities, separated by commas" value={d.amenitiesText} onChange={(e) => setD({ ...d, amenitiesText: e.target.value })} />
           </div>
           <p className="text-sm text-navy/60">Photos (the first one is the cover)</p>
           <ImageUpload value={d.images} onChange={(images) => setD({ ...d, images })} />
+          <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={!!d.isHeadOffice} onChange={(e) => setD({ ...d, isHeadOffice: e.target.checked })} /> This is the head office</label>
           <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={d.active} onChange={(e) => setD({ ...d, active: e.target.checked })} /> Show this branch to guests</label>
           <div className="flex gap-2"><button className="btn-gold">{d._id ? 'Save branch' : 'Add branch'}</button><button type="button" className="btn-ghost" onClick={() => setD(null)}>Cancel</button></div>
         </form>
