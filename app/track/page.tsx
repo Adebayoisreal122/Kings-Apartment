@@ -44,7 +44,7 @@ export default function Track() {
     try { setSaved(JSON.parse(localStorage.getItem(SAVED) || '[]')); } catch {}
     const q = new URLSearchParams(location.search);
     const ref = q.get('ref'), t = q.get('t'), payref = q.get('reference') || q.get('trxref');
-    if (q.get('new')) setNote('Booking received! We have sent the details to your phone by SMS. Download your ticket below and pay online to secure your room.');
+    if (q.get('new')) setNote('Booking received! We have sent the details to your phone by SMS. Pay online to secure your room and unlock your check-in ticket.');
     if (ref && t) open(ref, { t }, payref || undefined).then(() => { if (payref) setNote('Thank you! We are confirming your payment.'); history.replaceState(null, '', `/track?ref=${ref}&t=${t}`); });
   }, [open]);
 
@@ -103,12 +103,14 @@ export default function Track() {
               {b.discount > 0 && <div className="flex justify-between text-emerald-700"><dt>Coupon {b.couponCode}</dt><dd>-{naira(b.discount)}</dd></div>}
               <div className="flex justify-between text-lg"><dt>Total</dt><dd>{naira(b.total)}</dd></div>
             </dl>
-            {b.status !== 'cancelled' && (
+            {b.status !== 'cancelled' && (b.paymentStatus === 'paid' ? (
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gold/50 bg-gold-soft p-4">
-                <p className="text-sm"><b>Your check-in ticket.</b> Download it and show it at reception, printed or on your phone.</p>
+                <p className="text-sm"><b>Your check-in ticket is ready.</b> Download it and show it at reception, printed or on your phone.</p>
                 <button className="btn-gold" onClick={ticket}><Download size={16} className="mr-2" />Download ticket (PDF)</button>
               </div>
-            )}
+            ) : (
+              <p className="rounded-xl border border-navy/15 bg-navy-50 p-4 text-sm"><b>Your check-in ticket unlocks once your payment is received.</b> Use the Pay button below to pay online.</p>
+            ))}
             <div className="flex flex-wrap gap-2">
               {b.paymentStatus === 'unpaid' && b.status !== 'cancelled' && <button className="btn-gold" onClick={pay}>Pay {naira(b.total)} online</button>}
               {['pending', 'confirmed'].includes(b.status) && <button className="btn-ghost" onClick={cancel}>Cancel booking</button>}
